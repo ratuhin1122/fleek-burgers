@@ -13,7 +13,7 @@ export default function Halal() {
                         muted
                         playsInline
                         preload="auto"
-                        className="anim-duration-1000 fixed top-0 z-0 h-full w-full animate-in overflow-hidden object-cover opacity-30 transition-all duration-1000 fade-in"
+                        className="anim-duration-1000 fixed top-0 z-0 h-full w-full animate-in overflow-hidden object-cover opacity-55 transition-all duration-1000 fade-in"
                     >
                         <source src="/images/Burger.mp4" type="video/mp4" />
                     </video>

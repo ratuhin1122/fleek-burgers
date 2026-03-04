@@ -22,7 +22,7 @@ export default function Header() {
     // const { auth } = usePage<SharedData>().props;
 
     return (
-        <header className="flex justify-center backdrop-blur-sm fixed md:absolute top-0 left-0 z-50 w-full h-[70px]">
+        <header className="flex justify-center backdrop-blur-sm fixed top-0 left-0 z-50 w-full h-[70px]">
             <div className="flex items-center mt-2 mx-2 justify-between w-full max-w-6xl px-1 py-1 rounded-xl border border-[#da8025]/20 bg-[#1a120b] text-white">
                 {/* Logo Link */}
                 <Link

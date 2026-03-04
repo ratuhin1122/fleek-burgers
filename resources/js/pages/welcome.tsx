@@ -3,7 +3,7 @@ import { dashboard, login, register } from '@/routes';
 import Homelayout from '@/layouts/home/Homelayout';
 import { SlLocationPin } from 'react-icons/sl';
 import { BsTelephone } from 'react-icons/bs';
-// import Menuicon from '@/components/Menuicon';
+import { BsMenuApp } from 'react-icons/bs';
 
 export default function Welcome({
     canRegister = true,
@@ -14,7 +14,7 @@ export default function Welcome({
 
     return (
         <>
-            <Head title="Welcome">
+            <Head title="Fleek || Burgers">
                 <link rel="preconnect" href="https://fonts.bunny.net" />
                 <link
                     href="https://fonts.bunny.net/css?family=instrument-sans:400,500,600"
@@ -30,7 +30,7 @@ export default function Welcome({
                         muted
                         playsInline
                         preload="auto"
-                        className="anim-duration-1000 fixed top-0 z-0 h-full w-full animate-in overflow-hidden object-cover opacity-30 transition-all duration-1000 fade-in"
+                        className="anim-duration-1000 fixed top-0 z-0 h-full w-full animate-in overflow-hidden object-cover opacity-55 transition-all duration-1000 fade-in"
                     >
                         <source src="/images/Burger.mp4" type="video/mp4" />
                     </video>
@@ -109,11 +109,10 @@ export default function Welcome({
 
                             <Link
                                 href="/menu"
-                                className="inline-flex items-center gap-2 rounded-xl border border-[#da8025]/20 bg-[#7e4710] px-4 py-2 text-sm text-white transition duration-200 hover:bg-[#925617] sm:px-6 sm:py-3 sm:text-lg"
+                                className="inline-flex items-center gap-3 rounded-xl border border-[#da8025]/20 bg-[#7e4710] px-4 py-2 text-sm text-[#efd9c3] transition duration-300 hover:bg-[#925617] hover:scale-105 active:scale-95 sm:px-6 sm:py-3 sm:text-lg uppercase font-bold tracking-widest shadow-xl shadow-orange-950/20"
                             >
-                                {/* <Menuicon size={18}/> */}
-
-                                <span>View the menu</span>
+                                <BsMenuApp size={20} />
+                                <span>View our menu</span>
                             </Link>
 
                             <div className="mt-8 flex flex-col items-center lg:items-start">
