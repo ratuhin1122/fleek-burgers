@@ -113,7 +113,7 @@ export default function menu({ items = [] }: { items?: MenuItem[] }) {
             
             <section className="relative min-h-screen w-full bg-[#0a0a0a] pt-24 pb-20">
                 {/* Background Video/Cinematic Layer */}
-                <div className="fixed inset-0 z-0 opacity-40 transition-opacity duration-1000">
+                <div className="fixed inset-0 z-0 opacity-20 transition-opacity duration-1000">
                     <video
                         autoPlay
                         loop
@@ -121,7 +121,7 @@ export default function menu({ items = [] }: { items?: MenuItem[] }) {
                         playsInline
                         className="h-full w-full object-cover"
                     >
-                        <source src="/images/Burger.mp4" type="video/mp4" />
+                        <source src="/images/Menu.mp4" type="video/mp4" />
                     </video>
                     <div className="absolute inset-0 bg-gradient-to-t from-[#0a0a0a] via-transparent to-[#0a0a0a]" />
                 </div>
@@ -141,7 +141,7 @@ export default function menu({ items = [] }: { items?: MenuItem[] }) {
                     <div className="flex flex-col lg:flex-row gap-12">
                         {/* Sidebar - Desktop */}
                         <aside className="hidden lg:block w-64 flex-shrink-0">
-                            <div className="sticky top-32 space-y-2 rounded-3xl border border-white/10 bg-white/5 p-4 backdrop-blur-2xl shadow-xl">
+                            <div className="sticky top-32 space-y-2 rounded-3xl border border-white/10 bg-[#1a120b] p-4 backdrop-blur-2xl shadow-xl">
                                 <h3 className="px-4 py-2 text-xs font-bold uppercase tracking-widest text-[#A48E75]">Categories</h3>
                                 <nav className="flex flex-col gap-1">
                                     {CATEGORIES.map((cat) => (
@@ -193,7 +193,7 @@ export default function menu({ items = [] }: { items?: MenuItem[] }) {
                                     <motion.div 
                                         initial={{ opacity: 0 }} 
                                         animate={{ opacity: 1 }} 
-                                        className="text-center py-20 bg-white/5 border border-white/10 rounded-3xl"
+                                        className="text-center py-20 bg-[#1a120b] border border-white/10 rounded-3xl"
                                     >
                                         <p className="text-[#A48E75] text-xl font-bold tracking-widest uppercase">No items available yet.</p>
                                     </motion.div>

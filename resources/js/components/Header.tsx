@@ -1,6 +1,7 @@
 import { SlLocationPin } from "react-icons/sl";
 import { BsTelephone } from "react-icons/bs";
 import { BsMenuApp } from "react-icons/bs";
+import { HiHome } from "react-icons/hi";
 
 // import Togglebtn from "@/components/Tooglebtn";
 import { PiTiktokLogoThin } from "react-icons/pi";
@@ -75,6 +76,17 @@ export default function Header() {
                                         <HiX size={24} />
                                     </button>
                                 </div>
+                                 <Link
+                                    href="/"
+                                    onClick={() => setIsOpen(false)}
+                                    className="flex items-center gap-3 rounded-lg py-3 px-4 text-lg font-medium text-[#efd9c3] hover:bg-[#766656] transition-colors"
+                                >
+                                    {/*add icon for menu*/}
+                                    
+                                    <HiHome size={24} />
+                                    <span>Home</span>
+                                </Link>
+                                
                                 <Link
                                     href="/menu"
                                     onClick={() => setIsOpen(false)}
