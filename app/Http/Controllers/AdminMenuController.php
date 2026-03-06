@@ -3,16 +3,21 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Storage;
+use App\Repositories\ProductRepository;
 use Inertia\Inertia;
-use Carbon\Carbon;
 
 class AdminMenuController extends Controller
 {
+    protected $repository;
+
+    public function __construct(ProductRepository $repository)
+    {
+        $this->repository = $repository;
+    }
+
     public function index()
     {
-        $items = DB::select('SELECT * FROM menu_items ORDER BY id DESC');
+        $items = $this->repository->getAllDesc();
         return Inertia::render('Admin/Dashboard', [
             'items' => $items,
         ]);
@@ -40,27 +45,20 @@ class AdminMenuController extends Controller
             $imagePath = '/storage/' . $request->file('image')->store('menu_images', 'public');
         }
 
-        $now = Carbon::now();
-
-        DB::insert(
-            'INSERT INTO menu_items (name, description, price, image, category, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)',
-            [
-                $validated['name'],
-                $validated['description'] ?? null,
-                $validated['price'],
-                $imagePath,
-                $validated['category'],
-                $now,
-                $now
-            ]
-        );
+        $this->repository->create([
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'price' => $validated['price'],
+            'image' => $imagePath,
+            'category' => $validated['category']
+        ]);
 
         return redirect()->route('admin.dashboard')->with('success', 'Item created successfully.');
     }
 
     public function edit($id)
     {
-        $item = DB::selectOne('SELECT * FROM menu_items WHERE id = ? LIMIT 1', [$id]);
+        $item = $this->repository->findById($id);
 
         if (!$item) {
             abort(404);
@@ -82,42 +80,27 @@ class AdminMenuController extends Controller
         ]);
 
         // Get existing item to preserve image if a new one isn't uploaded
-        $existingItem = DB::selectOne('SELECT image FROM menu_items WHERE id = ? LIMIT 1', [$id]);
+        $existingItem = $this->repository->findById($id);
         $imagePath = $existingItem->image;
 
         if ($request->hasFile('image')) {
-            // Delete old image if it exists
-            if ($imagePath && str_starts_with($imagePath, '/storage/')) {
-                Storage::disk('public')->delete(str_replace('/storage/', '', $imagePath));
-            }
             $imagePath = '/storage/' . $request->file('image')->store('menu_images', 'public');
         }
 
-        DB::update(
-            'UPDATE menu_items SET name = ?, description = ?, price = ?, image = ?, category = ?, updated_at = ? WHERE id = ?',
-            [
-                $validated['name'],
-                $validated['description'] ?? null,
-                $validated['price'],
-                $imagePath,
-                $validated['category'],
-                Carbon::now(),
-                $id
-            ]
-        );
+        $this->repository->update($id, [
+            'name' => $validated['name'],
+            'description' => $validated['description'] ?? null,
+            'price' => $validated['price'],
+            'image' => $imagePath,
+            'category' => $validated['category']
+        ]);
 
         return redirect()->route('admin.dashboard')->with('success', 'Item updated successfully.');
     }
 
     public function destroy($id)
     {
-        $item = DB::selectOne('SELECT image FROM menu_items WHERE id = ? LIMIT 1', [$id]);
-        
-        if ($item && $item->image && str_starts_with($item->image, '/storage/')) {
-            Storage::disk('public')->delete(str_replace('/storage/', '', $item->image));
-        }
-
-        DB::delete('DELETE FROM menu_items WHERE id = ?', [$id]);
+        $this->repository->delete($id);
 
         return redirect()->route('admin.dashboard')->with('success', 'Item deleted successfully.');
     }

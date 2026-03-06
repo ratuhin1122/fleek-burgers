@@ -6,6 +6,7 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminMenuController;
 use App\Http\Middleware\CheckAdmin;
+use App\Repositories\ProductRepository;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -21,19 +22,19 @@ Route::get('/halal', function () {
     return Inertia::render('Halal');
 })->name('halal');
 
-Route::get('/menu', function () {
-    $items = \Illuminate\Support\Facades\DB::select('SELECT * FROM menu_items ORDER BY id DESC');
+Route::get('/menu', function (ProductRepository $repository) {
+    $items = $repository->getAllDesc();
     return Inertia::render('menu', [
         'items' => $items
     ]);
-})->name('menu');
+})->middleware('throttle:60,1')->name('menu');
 
 require __DIR__.'/settings.php';
 
 // Admin Routes
 Route::prefix('admin')->group(function () {
     Route::get('/login', [AdminAuthController::class, 'showLogin'])->name('admin.login');
-    Route::post('/login', [AdminAuthController::class, 'login']);
+    Route::post('/login', [AdminAuthController::class, 'login'])->middleware('throttle:5,1');
     
     Route::group(['middleware' => [CheckAdmin::class]], function () {
         Route::post('/logout', [AdminAuthController::class, 'logout'])->name('admin.logout');

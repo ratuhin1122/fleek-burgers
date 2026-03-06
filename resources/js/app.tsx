@@ -4,6 +4,16 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import '../css/app.css';
 import { initializeTheme } from './hooks/use-appearance';
+import axios from 'axios';
+
+// Ensure Axios sends custom token
+axios.interceptors.request.use((config) => {
+    const token = localStorage.getItem('admin_token');
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+});
 
 const appName = import.meta.env.VITE_APP_NAME || 'Laravel';
 
