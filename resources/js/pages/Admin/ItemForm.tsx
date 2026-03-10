@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef, useState } from 'react';
 import { Head, Link, useForm } from '@inertiajs/react';
 
 interface MenuItem {
@@ -12,23 +12,32 @@ interface MenuItem {
 
 export default function ItemForm({ item }: { item: MenuItem | null }) {
     const isEdit = !!item;
+    const fileInputRef = useRef<HTMLInputElement>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(item?.image || null);
 
     const { data, setData, post, processing, errors } = useForm({
         name: item?.name || '',
         description: item?.description || '',
         price: item?.price || '',
-        image: null as File | null,
+        image: null as File | null | string, 
         category: item?.category || 'beef',
         _method: isEdit ? 'put' : 'post',
     });
 
     const categories = ['beef', 'chicken', 'vegetarian', 'mutton', 'sides'];
 
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (file) {
+            setData('image', file);
+            setPreviewUrl(URL.createObjectURL(file));
+        }
+    };
+
     const submit = (e: React.FormEvent) => {
         e.preventDefault();
         
-        // We use POST even for updates because HTML forms with files (multipart/form-data) 
-        // don't always play nicely with PUT. The _method field tells Laravel it's actually a PUT requested.
+        // Inertia will automatically handle multipart/form-data when files are present
         post(isEdit ? `/admin/items/${item.id}` : '/admin/items', {
             forceFormData: true,
             preserveScroll: true,
@@ -55,6 +64,42 @@ export default function ItemForm({ item }: { item: MenuItem | null }) {
 
                     <form onSubmit={submit} className="space-y-6">
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            {/* Image Upload Area */}
+                            <div className="sm:col-span-2 space-y-4">
+                                <label className="block text-sm font-bold tracking-wider text-[#A48E75] uppercase mb-2">Item Image</label>
+                                
+                                <div 
+                                    onClick={() => fileInputRef.current?.click()}
+                                    className="relative h-64 w-full bg-black/40 border-2 border-dashed border-white/10 rounded-2xl overflow-hidden cursor-pointer hover:border-[#da8025]/50 transition-all group"
+                                >
+                                    {previewUrl ? (
+                                        <div className="relative w-full h-full">
+                                            <img src={previewUrl} alt="Preview" className="w-full h-full object-contain" />
+                                            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
+                                                <span className="text-white font-bold uppercase tracking-widest text-sm">Change Image</span>
+                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="w-full h-full flex flex-col items-center justify-center text-[#A48E75]">
+                                            <svg className="w-12 h-12 mb-3 opacity-30" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                                            </svg>
+                                            <p className="text-sm font-bold tracking-widest uppercase">Click to upload image</p>
+                                            <p className="text-xs mt-1 opacity-50">JPG, PNG, WEBP (Max 2MB)</p>
+                                        </div>
+                                    )}
+                                </div>
+                                
+                                <input
+                                    type="file"
+                                    ref={fileInputRef}
+                                    onChange={handleFileChange}
+                                    className="hidden"
+                                    accept="image/*"
+                                />
+                                {errors.image && <p className="mt-1 text-sm text-red-400">{errors.image}</p>}
+                            </div>
+
                             <div className="sm:col-span-2">
                                 <label className="block text-sm font-bold tracking-wider text-[#A48E75] uppercase mb-2">Item Name</label>
                                 <input
@@ -69,17 +114,24 @@ export default function ItemForm({ item }: { item: MenuItem | null }) {
 
                             <div>
                                 <label className="block text-sm font-bold tracking-wider text-[#A48E75] uppercase mb-2">Category</label>
-                                <select
-                                    value={data.category}
-                                    onChange={(e) => setData('category', e.target.value)}
-                                    className="w-full bg-[#1a120b] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#da8025] transition-colors appearance-none"
-                                >
-                                    {categories.map(cat => (
-                                        <option key={cat} value={cat} className="uppercase bg-[#1a120b]">
-                                            {cat}
-                                        </option>
-                                    ))}
-                                </select>
+                                <div className="relative">
+                                    <select
+                                        value={data.category}
+                                        onChange={(e) => setData('category', e.target.value)}
+                                        className="w-full bg-[#1a120b] border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#da8025] transition-colors appearance-none pr-10"
+                                    >
+                                        {categories.map(cat => (
+                                            <option key={cat} value={cat} className="uppercase bg-[#1a120b]">
+                                                {cat}
+                                            </option>
+                                        ))}
+                                    </select>
+                                    <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none">
+                                        <svg className="w-5 h-5 text-[#da8025]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                                        </svg>
+                                    </div>
+                                </div>
                                 {errors.category && <p className="mt-1 text-sm text-red-400">{errors.category}</p>}
                             </div>
 
@@ -94,23 +146,6 @@ export default function ItemForm({ item }: { item: MenuItem | null }) {
                                     required
                                 />
                                 {errors.price && <p className="mt-1 text-sm text-red-400">{errors.price}</p>}
-                            </div>
-
-                            <div className="sm:col-span-2">
-                                <label className="block text-sm font-bold tracking-wider text-[#A48E75] uppercase mb-2">Item Image</label>
-                                {isEdit && item.image && (
-                                    <div className="mb-4">
-                                        <p className="text-xs text-[#A48E75] mb-2 uppercase tracking-wide">Current Image:</p>
-                                        <img src={item.image} alt="Current" className="w-24 h-24 object-cover rounded-xl border border-white/10" />
-                                    </div>
-                                )}
-                                <input
-                                    type="file"
-                                    accept="image/*"
-                                    onChange={(e) => setData('image', e.target.files ? e.target.files[0] : null)}
-                                    className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 text-white focus:outline-none focus:border-[#da8025] transition-colors file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-[#da8025] file:text-white hover:file:bg-[#c47221] cursor-pointer"
-                                />
-                                {errors.image && <p className="mt-1 text-sm text-red-400">{errors.image}</p>}
                             </div>
 
                             <div className="sm:col-span-2">
@@ -131,7 +166,7 @@ export default function ItemForm({ item }: { item: MenuItem | null }) {
                                 disabled={processing}
                                 className="flex-1 bg-[#da8025] hover:bg-[#c47221] text-white font-bold py-3 px-6 rounded-xl transition-colors uppercase tracking-widest disabled:opacity-50"
                             >
-                                {processing ? 'Saving...' : 'Save Item'}
+                                {processing ? 'Saving...' : (isEdit ? 'Update Item' : 'Add Burger')}
                             </button>
                             <Link
                                 href="/admin/dashboard"

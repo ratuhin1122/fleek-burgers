@@ -24,11 +24,9 @@ class AdminAuthController extends Controller
         ]);
 
         if ($request->email === env('ADMIN_EMAIL') && $request->password === env('ADMIN_PASSWORD')) {
-            $token = bin2hex(random_bytes(32));
             session(['admin_logged_in' => true]);
             session(['admin_id' => 1]);
-            session(['admin_token' => $token]);
-            return redirect()->route('admin.dashboard')->with('admin_token', $token);
+            return redirect()->route('admin.dashboard');
         }
 
         return back()->withErrors(['email' => 'Invalid credentials.']);
@@ -36,7 +34,7 @@ class AdminAuthController extends Controller
 
     public function logout()
     {
-        session()->forget(['admin_logged_in', 'admin_id', 'admin_token']);
+        session()->forget(['admin_logged_in', 'admin_id']);
         return redirect()->route('admin.login');
     }
 }

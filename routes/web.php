@@ -6,7 +6,6 @@ use Laravel\Fortify\Features;
 use App\Http\Controllers\AdminAuthController;
 use App\Http\Controllers\AdminMenuController;
 use App\Http\Middleware\CheckAdmin;
-use App\Repositories\ProductRepository;
 
 Route::get('/', function () {
     return Inertia::render('welcome', [
@@ -22,8 +21,8 @@ Route::get('/halal', function () {
     return Inertia::render('Halal');
 })->name('halal');
 
-Route::get('/menu', function (ProductRepository $repository) {
-    $items = $repository->getAllDesc();
+Route::get('/menu', function () {
+    $items = \Illuminate\Support\Facades\DB::select('SELECT * FROM menu_items ORDER BY id DESC');
     return Inertia::render('menu', [
         'items' => $items
     ]);

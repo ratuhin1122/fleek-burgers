@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { Head, Link, useForm, usePage } from '@inertiajs/react';
+import { Head, Link, useForm, usePage, router } from '@inertiajs/react';
 import { motion } from 'framer-motion';
 
 interface MenuItem {
@@ -14,12 +14,6 @@ interface MenuItem {
 export default function Dashboard({ items }: { items: MenuItem[] }) {
     const { delete: destroy } = useForm();
     const { flash } = usePage().props as any;
-
-    useEffect(() => {
-        if (flash?.admin_token) {
-            localStorage.setItem('admin_token', flash.admin_token);
-        }
-    }, [flash]);
 
     const handleDelete = (id: number) => {
         if (confirm('Are you sure you want to delete this item?')) {

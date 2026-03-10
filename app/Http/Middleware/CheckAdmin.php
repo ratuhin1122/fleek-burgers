@@ -8,18 +8,19 @@ use Symfony\Component\HttpFoundation\Response;
 
 class CheckAdmin
 {
+    /**
+     * Handle an incoming request.
+     *
+     * @param  \Closure(\Illuminate\Http\Request): (\Symfony\Component\HttpFoundation\Response)  $next
+     */
     public function handle(Request $request, Closure $next): Response
     {
+        // Simple session-based check as requested (custom token logic removed)
         if (!session('admin_logged_in')) {
-            return redirect()->route('admin.login');
-        }
-
-        // Verify custom token on POST/PUT/DELETE requests (CSRF protection layer)
-        if (in_array($request->method(), ['POST', 'PUT', 'DELETE', 'PATCH'])) {
-            $token = $request->bearerToken();
-            if (!$token || $token !== session('admin_token')) {
-                abort(403, 'Invalid or missing Custom CSRF token.');
+            if ($request->expectsJson()) {
+                return response()->json(['message' => 'Unauthorized.'], 401);
             }
+            return redirect()->route('admin.login');
         }
 
         return $next($request);
